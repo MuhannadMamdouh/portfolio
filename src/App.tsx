@@ -27,8 +27,8 @@ function useCMS(): CMSData {
   return data;
 }
 
-function FadeIn({children, delay=0, duration=.7, x=0, y=30, className=''}:{children:ReactNode;delay?:number;duration?:number;x?:number;y?:number;className?:string}) {
- return <motion.div className={className} initial={{opacity:0,x,y}} whileInView={{opacity:1,x:0,y:0}} viewport={{once:true,margin:'50px',amount:0}} transition={{delay,duration,ease:[.25,.1,.25,1]}}>{children}</motion.div>;
+function FadeIn({children, delay=0, duration=.7, x=0, y=30, className='', style}:{children:ReactNode;delay?:number;duration?:number;x?:number;y?:number;className?:string;style?:React.CSSProperties}) {
+ return <motion.div className={className} style={style} initial={{opacity:0,x,y}} whileInView={{opacity:1,x:0,y:0}} viewport={{once:true,margin:'50px',amount:0}} transition={{delay,duration,ease:[.25,.1,.25,1]}}>{children}</motion.div>;
 }
 
 function ContactButton({ phone = '201556745183' }: { phone?: string }) {
@@ -50,7 +50,7 @@ function Magnet({children}:{children:ReactNode}){
 
 
 function Hero() {
-  const { settings } = useCMS();
+  const settings = readCMS().settings;
 
   return (
     <section id="home" className="hero section-dark">
@@ -75,32 +75,30 @@ function Hero() {
         </FadeIn>
       </div>
 
-      <div className="hero-bottom">
-        <FadeIn delay={0.35} y={20}>
+      <div className="hero-bottom" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', width: '100%', padding: '0 20px' }}>
+        <FadeIn delay={0.35} y={20} style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
           <p
             className="hero-blurb"
             style={{
-  fontSize: `clamp(10px, ${settings.heroBlurbSize ?? 16}px, 36px)`,
-  textAlign: settings.heroBlurbAlign ?? 'center',
-  whiteSpace: 'pre-line',
-  width: '100%',
-  maxWidth: '900px',
-  margin: '0 auto',
-}}
+              fontSize: 'clamp(14px, 3.8vw, 20px)', // حجم خط أصغر وأنسب للموبايل
+              textAlign: 'center',
+              whiteSpace: 'pre-line',
+              width: '100%',
+              maxWidth: '900px',
+              margin: '0 auto 24px auto',
+            }}
           >
             {settings.heroBlurb}
           </p>
         </FadeIn>
 
-        <FadeIn delay={0.5} y={20}>
+        <FadeIn delay={0.5} y={20} style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
           <ContactButton />
         </FadeIn>
       </div>
     </section>
   );
 }
-
-
 function Marquee() {
   const ref = useRef<HTMLElement>(null);
   const [offset, setOffset] = useState(0);

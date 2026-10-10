@@ -112,7 +112,7 @@ function Hero() {
         </FadeIn>
 
         {/* الزرار على اليمين في اللاب توب */}
-        <FadeIn delay={0.5} y={20} className="hero-btn-wrapper" style={{ display: 'flex', justifyContent: 'center', width: '100%', maxWidth: '900px', margin: '0 auto' }}>
+        <FadeIn delay={0.5} y={20} className="hero-btn-wrapper" style={{ display: 'flex', justifyContent: 'center', width: '100%', maxWidth: '100%', margin: '0 auto' }}>
           <ContactButton />
         </FadeIn>
       </div>

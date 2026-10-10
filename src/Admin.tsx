@@ -382,7 +382,7 @@ if (!isAuthenticated) {
       
 
 
-      {tab === 'categories' && (
+    {tab === 'categories' && (
         <section className="admin-panel">
           <div className="panel-heading">
             <div>
@@ -394,13 +394,13 @@ if (!isAuthenticated) {
             </button>
           </div>
           {data.categories.map((c, index) => (
-            <div key={c.id} className="category-row" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                 <button 
                   type="button" 
                   onClick={() => moveCategoryUp(index)} 
                   disabled={index === 0}
-                  style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '10px', opacity: index === 0 ? 0.3 : 1 }}
+                  style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px', opacity: index === 0 ? 0.3 : 1, padding: '2px 6px' }}
                   title="تحريك لأعلى"
                 >
                   ▲
@@ -409,30 +409,33 @@ if (!isAuthenticated) {
                   type="button" 
                   onClick={() => moveCategoryDown(index)} 
                   disabled={index === data.categories.length - 1}
-                  style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '10px', opacity: index === data.categories.length - 1 ? 0.3 : 1 }}
+                  style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px', opacity: index === data.categories.length - 1 ? 0.3 : 1, padding: '2px 6px' }}
                   title="تحريك لأسفل"
                 >
                   ▼
                 </button>
               </div>
-              <div className="category-icon"><Tags size={18} /></div>
-              <div className="category-info">
-                <strong>{c.name}</strong>
-                <span>{data.projects.filter(p => p.categoryId === c.id).length} projects</span>
+
+              <div className="category-row" style={{ flex: 1, margin: 0 }}>
+                <div className="category-icon"><Tags size={18} /></div>
+                <div className="category-info">
+                  <strong>{c.name}</strong>
+                  <span>{data.projects.filter(p => p.categoryId === c.id).length} projects</span>
+                </div>
+                <button type="button" className="icon-action" title={c.visible ? 'Hide category' : 'Show category'} onClick={() => setData(d => ({ ...d, categories: d.categories.map(x => x.id === c.id ? { ...x, visible: !x.visible } : x) }))}>
+                  {c.visible ? <Eye size={17} /> : <EyeOff size={17} />}
+                </button>
+                <button type="button" className="icon-action" title="Edit" onClick={() => setCategoryDraft(c)}>
+                  <Pencil size={17} />
+                </button>
+                <button type="button" className="icon-action danger" title="Delete" onClick={() => { if (confirm(`Delete category “${c.name}”? Projects in it will become uncategorized.`)) setData(d => ({ ...d, categories: d.categories.filter(x => x.id !== c.id), projects: d.projects.map(p => p.categoryId === c.id ? { ...p, categoryId: '' } : p) })); }}>
+                  <Trash2 size={17} />
+                </button>
               </div>
-              <button className="icon-action" title={c.visible ? 'Hide category' : 'Show category'} onClick={() => setData(d => ({ ...d, categories: d.categories.map(x => x.id === c.id ? { ...x, visible: !x.visible } : x) }))}>
-                {c.visible ? <Eye size={17} /> : <EyeOff size={17} />}
-              </button>
-              <button className="icon-action" title="Edit" onClick={() => setCategoryDraft(c)}>
-                <Pencil size={17} />
-              </button>
-              <button className="icon-action danger" title="Delete" onClick={() => { if (confirm(`Delete category “${c.name}”? Projects in it will become uncategorized.`)) setData(d => ({ ...d, categories: d.categories.filter(x => x.id !== c.id), projects: d.projects.map(p => p.categoryId === c.id ? { ...p, categoryId: '' } : p) })); }}>
-                <Trash2 size={17} />
-              </button>
             </div>
           ))}
         </section>
-      )} 
+      )}
       
       {/* --- تاب الخدمات الجديد --- */}
       {tab === 'services' && (

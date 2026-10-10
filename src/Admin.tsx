@@ -361,8 +361,60 @@ if (!isAuthenticated) {
   </section>
 )}
       
-      {tab === 'categories' && <section className="admin-panel"><div className="panel-heading"><div><h3>Categories</h3><p>Create and rename categories used by project forms.</p></div><button className="admin-primary" onClick={() => setCategoryDraft({ id: crypto.randomUUID(), name: '', visible: true })}><Plus size={17} /> Add category</button></div>{data.categories.map(c => <div className="category-row" key={c.id}><div className="category-icon"><Tags size={18} /></div><div className="category-info"><strong>{c.name}</strong><span>{data.projects.filter(p => p.categoryId === c.id).length} projects</span></div><button className="icon-action" title={c.visible ? 'Hide category' : 'Show category'} onClick={() => setData(d => ({ ...d, categories: d.categories.map(x => x.id === c.id ? { ...x, visible: !x.visible } : x) }))}>{c.visible ? <Eye size={17} /> : <EyeOff size={17} />}</button><button className="icon-action" title="Edit" onClick={() => setCategoryDraft(c)}><Pencil size={17} /></button><button className="icon-action danger" title="Delete" onClick={() => { if (confirm(`Delete category “${c.name}”? Projects in it will become uncategorized.`)) setData(d => ({ ...d, categories: d.categories.filter(x => x.id !== c.id), projects: d.projects.map(p => p.categoryId === c.id ? { ...p, categoryId: '' } : p) })); }}><Trash2 size={17} /></button></div>)}</section>}
 
+
+      {tab === 'categories' && (
+        <section className="admin-panel">
+          <div className="panel-heading">
+            <div>
+              <h3>Categories</h3>
+              <p>Create and rename categories used by project forms.</p>
+            </div>
+            <button className="admin-primary" onClick={() => setCategoryDraft({ id: crypto.randomUUID(), name: '', visible: true })}>
+              <Plus size={17} /> Add category
+            </button>
+          </div>
+          {data.categories.map((c, index) => (
+            <div key={c.id} className="category-row" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <button 
+                  type="button" 
+                  onClick={() => moveCategoryUp(index)} 
+                  disabled={index === 0}
+                  style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '10px', opacity: index === 0 ? 0.3 : 1 }}
+                  title="تحريك لأعلى"
+                >
+                  ▲
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => moveCategoryDown(index)} 
+                  disabled={index === data.categories.length - 1}
+                  style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '10px', opacity: index === data.categories.length - 1 ? 0.3 : 1 }}
+                  title="تحريك لأسفل"
+                >
+                  ▼
+                </button>
+              </div>
+              <div className="category-icon"><Tags size={18} /></div>
+              <div className="category-info">
+                <strong>{c.name}</strong>
+                <span>{data.projects.filter(p => p.categoryId === c.id).length} projects</span>
+              </div>
+              <button className="icon-action" title={c.visible ? 'Hide category' : 'Show category'} onClick={() => setData(d => ({ ...d, categories: d.categories.map(x => x.id === c.id ? { ...x, visible: !x.visible } : x) }))}>
+                {c.visible ? <Eye size={17} /> : <EyeOff size={17} />}
+              </button>
+              <button className="icon-action" title="Edit" onClick={() => setCategoryDraft(c)}>
+                <Pencil size={17} />
+              </button>
+              <button className="icon-action danger" title="Delete" onClick={() => { if (confirm(`Delete category “${c.name}”? Projects in it will become uncategorized.`)) setData(d => ({ ...d, categories: d.categories.filter(x => x.id !== c.id), projects: d.projects.map(p => p.categoryId === c.id ? { ...p, categoryId: '' } : p) })); }}>
+                <Trash2 size={17} />
+              </button>
+            </div>
+          ))}
+        </section>
+      )} 
+      
       {/* --- تاب الخدمات الجديد --- */}
       {tab === 'services' && (
         <section className="admin-panel">

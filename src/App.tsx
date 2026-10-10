@@ -75,13 +75,22 @@ function Hero() {
         </FadeIn>
       </div>
 
-      <div className="hero-bottom" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', width: '100%', padding: '0 20px' }}>
+      {/* التعديل هنا: على الموبايل في النص، وعلى اللاب توب (md) على الشمال */}
+      <div 
+        className="hero-bottom" 
+        style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          width: '100%', 
+          padding: '0 20px' 
+        }}
+      >
         <FadeIn delay={0.35} y={20} style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
           <p
             className="hero-blurb"
             style={{
-              fontSize: 'clamp(14px, 3.8vw, 20px)', // حجم خط أصغر وأنسب للموبايل
-              textAlign: 'center',
+              fontSize: 'clamp(14px, 3.8vw, 20px)',
               whiteSpace: 'pre-line',
               width: '100%',
               maxWidth: '900px',
@@ -92,8 +101,41 @@ function Hero() {
           </p>
         </FadeIn>
 
-        <FadeIn delay={0.5} y={20} style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-          <ContactButton />
+        {/* زرار التواصل: في النص على الموبايل، وعلى الشمال تماماً في اللاب توب */}
+        <FadeIn 
+          delay={0.5} 
+          y={20} 
+          style={{ 
+            display: 'flex', 
+            width: '100%', 
+            maxWidth: '900px',
+            justifyContent: 'center', // افتراضي للموبايل
+          }}
+        >
+          <div className="hero-action-container" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+            {/* أضفنا كلاس أو تنسيق هنا يخلي الزرار يروح شمال على الشاشات الكبيرة */}
+            <div className="contact-btn-wrapper" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+              <style>{`
+                @media (min-width: 768px) {
+                  .hero-bottom {
+                    align-items: flex-start !important;
+                    text-align: left !important;
+                  }
+                  .hero-blurb {
+                    text-align: left !important;
+                    margin: 0 0 24px 0 !important;
+                  }
+                  .hero-action-container {
+                    justify-content: flex-start !important;
+                  }
+                  .contact-btn-wrapper {
+                    justify-content: flex-start !important;
+                  }
+                }
+              `}</style>
+              <ContactButton />
+            </div>
+          </div>
         </FadeIn>
       </div>
     </section>

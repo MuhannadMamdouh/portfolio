@@ -255,6 +255,25 @@ if (!isAuthenticated) {
     newProjects[index + 1] = temp;
     setData(d => ({ ...d, projects: newProjects }));
   };
+
+  // --- دوال تحريك الـ Categories ---
+  const moveCategoryUp = (index: number) => {
+    if (index === 0) return;
+    const newCategories = [...data.categories];
+    const temp = newCategories[index];
+    newCategories[index] = newCategories[index - 1];
+    newCategories[index - 1] = temp;
+    setData(d => ({ ...d, categories: newCategories }));
+  };
+
+  const moveCategoryDown = (index: number) => {
+    if (index === data.categories.length - 1) return;
+    const newCategories = [...data.categories];
+    const temp = newCategories[index];
+    newCategories[index] = newCategories[index + 1];
+    newCategories[index + 1] = temp;
+    setData(d => ({ ...d, categories: newCategories }));
+  };
   
   const saveCategory = (e: FormEvent) => {
     e.preventDefault(); if (!categoryDraft?.name.trim()) return;

@@ -75,50 +75,71 @@ function Hero() {
         </FadeIn>
       </div>
 
-      <div className="hero-bottom" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: '0 20px' }}>
+      {/* الحاوية السفلية */}
+      <div className="hero-bottom-container">
         <style>{`
+          .hero-bottom-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 20px;
+            gap: 20px;
+          }
+
+          /* التنسيق للشاشات الكبيرة (اللاب توب) زي الصورة بالضبط */
           @media (min-width: 768px) {
-            .hero-bottom {
-              align-items: stretch !important;
+            .hero-bottom-container {
+              flex-direction: row !important;
+              justify-content: space-between !important;
+              align-items: flex-end !important;
+              padding: 0 40px !important;
             }
+
             .hero-blurb-wrapper {
-              justify-content: flex-start !important;
+              width: auto !important;
+              max-width: 500px !important;
             }
+
             .hero-blurb {
               text-align: left !important;
-              margin: 0 0 24px 0 !important;
+              margin: 0 !important;
             }
+
             .hero-btn-wrapper {
+              width: auto !important;
+              display: flex !important;
               justify-content: flex-end !important;
             }
           }
         `}</style>
 
-        {/* النص على الشمال في اللاب توب */}
-        <FadeIn delay={0.35} y={20} className="hero-blurb-wrapper" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+        {/* النص أقصى الشمال */}
+        <FadeIn delay={0.35} y={20} className="hero-blurb-wrapper" style={{ width: '100%' }}>
           <p
             className="hero-blurb"
             style={{
-              fontSize: 'clamp(14px, 3.8vw, 20px)',
+              fontSize: 'clamp(13px, 1.2vw, 16px)',
               textAlign: 'center',
               whiteSpace: 'pre-line',
-              width: '100%',
-              maxWidth: '900px',
-              margin: '0 auto 24px auto',
+              margin: '0 auto',
+              lineHeight: '1.4',
+              textTransform: 'uppercase',
             }}
           >
             {settings.heroBlurb}
           </p>
         </FadeIn>
 
-        {/* الزرار على اليمين في اللاب توب */}
-        <FadeIn delay={0.5} y={20} className="hero-btn-wrapper" style={{ display: 'flex', justifyContent: 'center', width: '100%', maxWidth: '100%', margin: '0 auto' }}>
+        {/* الزرار أقصى اليمين على نفس السطر */}
+        <FadeIn delay={0.5} y={20} className="hero-btn-wrapper" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
           <ContactButton />
         </FadeIn>
       </div>
     </section>
   );
 }
+
 function Marquee() {
   const ref = useRef<HTMLElement>(null);
   const [offset, setOffset] = useState(0);

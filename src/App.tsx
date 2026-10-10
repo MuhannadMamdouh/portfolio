@@ -327,7 +327,7 @@ function DynamicProjectCard({project,index,categories}:{project:CMSProject;index
 }
 
 function Projects(){
- const [cms]=useState(()=>readCMS());
+ const cms = useCMS();
  const [active,setActive]=useState('all');
  const categories=cms.categories.filter(c=>c.visible);
  const visibleProjects=cms.projects.filter(p=>p.published&&(active==='all'||p.categoryId===active));

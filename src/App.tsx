@@ -1,10 +1,31 @@
-import { useRef, useState, useEffect, type ReactNode, type MouseEvent } from 'react';
+import { createContext, useContext, useRef, useState, useEffect, type ReactNode, type MouseEvent } from 'react';
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { ArrowUpRight, Play } from 'lucide-react';
 import Admin from './Admin';
-import { readCMS, youtubeThumbnail, youtubeId, sanitizeSvg, type Project as CMSProject, type SiteSettings } from './cms';
+import { supabase } from './supabase';
+import {
+  readCMS,
+  youtubeThumbnail,
+  youtubeId,
+  sanitizeSvg,
+  type Project as CMSProject,
+  type SiteSettings,
+  type CMSData,
+} from './cms';
 
 const asset = 'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/';
+
+const CMSContext = createContext<CMSData | null>(null);
+
+function useCMS(): CMSData {
+  const data = useContext(CMSContext);
+
+  if (!data) {
+    throw new Error('CMS data is not available');
+  }
+
+  return data;
+}
 
 function FadeIn({children, delay=0, duration=.7, x=0, y=30, className=''}:{children:ReactNode;delay?:number;duration?:number;x?:number;y?:number;className?:string}) {
  return <motion.div className={className} initial={{opacity:0,x,y}} whileInView={{opacity:1,x:0,y:0}} viewport={{once:true,margin:'50px',amount:0}} transition={{delay,duration,ease:[.25,.1,.25,1]}}>{children}</motion.div>;
@@ -29,7 +50,7 @@ function Magnet({children}:{children:ReactNode}){
 
 
 function Hero() {
-  const settings = readCMS().settings;
+  const { settings } = useCMS();
 
   return (
     <section id="home" className="hero section-dark">
@@ -84,7 +105,7 @@ function Marquee() {
   const ref = useRef<HTMLElement>(null);
   const [offset, setOffset] = useState(0);
   // بنقرأ الصور (Gallery) من الـ CMS بدال الـ Array القديم الثابت
-  const gallery = readCMS().gallery || [];
+  const { gallery } = useCMS();
   
   useEffect(() => {
     const fn = () => {
@@ -181,7 +202,7 @@ function Letter({char,index,total,progress}:{char:string;index:number;total:numb
 
 
 function About() {
-  const settings = readCMS().settings;
+  const { settings } = useCMS();
 
   return (
     <section id="about" className="about-section section-dark">
@@ -248,7 +269,7 @@ function About() {
 
 function Services() {
   // بنسحب الخدمات من الـ CMS بدال المكتوبة في الكود الثابت
-  const servicesData = readCMS().services || [];
+  const { services: servicesData } = useCMS();
   
   if (servicesData.length === 0) return null;
 
@@ -350,14 +371,90 @@ function CustomCursor({settings}:{settings:SiteSettings}){
  return <div ref={cursorRef} className="custom-cursor-overlay" aria-hidden="true"><div dangerouslySetInnerHTML={{__html:svg}}/></div>;
 }
 
-export default function App(){
- const isAdmin=window.location.pathname.replace(/\/$/,'')==='/admin';
- const [settings]=useState(()=>readCMS().settings);
- useEffect(()=>{
-  if(isAdmin)return;
-  document.title=`${settings.brandName} — ${settings.name} | ${settings.role}`;
-  document.documentElement.style.setProperty('--brand-accent',settings.accent);
- },[isAdmin,settings]);
- if(isAdmin)return <Admin/>;
- return <main className="page-shell"><Hero/><Marquee/><About/><Services/><Projects/><CustomCursor settings={settings}/></main>;
+
+export default function App() {
+  const isAdmin = window.location.pathname.replace(/\/$/, '') === '/admin';
+  const [cms, setCms] = useState<CMSData>(() => readCMS());
+
+  useEffect(() => {
+    if (isAdmin) return;
+
+    let cancelled = false;
+
+    async function loadCMS() {
+      try {
+        const { data: row, error } = await supabase
+          .from('portfolio_content')
+          .select('content')
+          .eq('id', 1)
+          .maybeSingle();
+
+        if (error) throw error;
+        if (cancelled || !row?.content) return;
+
+        const remote = row.content as Partial<CMSData>;
+        const fallback = readCMS();
+
+        const merged: CMSData = {
+          ...fallback,
+          ...remote,
+          settings: {
+            ...fallback.settings,
+            ...(remote.settings || {}),
+          },
+          categories: Array.isArray(remote.categories)
+            ? remote.categories
+            : fallback.categories,
+          projects: Array.isArray(remote.projects)
+            ? remote.projects
+            : fallback.projects,
+          services: Array.isArray(remote.services)
+            ? remote.services
+            : fallback.services,
+          gallery: Array.isArray(remote.gallery)
+            ? remote.gallery
+            : fallback.gallery,
+        };
+
+        setCms(merged);
+      } catch (error) {
+        console.error(
+          'Could not load portfolio data from Supabase:',
+          error
+        );
+      }
+    }
+
+    void loadCMS();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (isAdmin) return;
+
+    document.title = `${cms.settings.brandName} — ${cms.settings.name} | ${cms.settings.role}`;
+
+    document.documentElement.style.setProperty(
+      '--brand-accent',
+      cms.settings.accent
+    );
+  }, [isAdmin, cms.settings]);
+
+  if (isAdmin) return <Admin />;
+
+  return (
+    <CMSContext.Provider value={cms}>
+      <main className="page-shell">
+        <Hero />
+        <Marquee />
+        <About />
+        <Services />
+        <Projects />
+        <CustomCursor settings={cms.settings} />
+      </main>
+    </CMSContext.Provider>
+  );
 }

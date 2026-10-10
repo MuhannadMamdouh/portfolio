@@ -50,104 +50,55 @@ function Magnet({children}:{children:ReactNode}){
 
 
 function Hero() {
-  const settings = readCMS().settings;
+  const settings = readCMS().settings;
 
-  return (
-    <section id="home" className="hero section-dark" style={{ overflowX: 'hidden' }}>
-      <FadeIn className="navbar" y={-20}>
-        <a href="#about">About</a>
-        <a href="#services">Price</a>
-        <a href="#projects">Projects</a>
-        <a href="#contact">Contact</a>
-      </FadeIn>
+  return (
+    <section id="home" className="hero section-dark">
+      <FadeIn className="navbar" y={-20}>
+        <a href="#about">About</a>
+        <a href="#services">Price</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </FadeIn>
 
-      {/* العنوان الرئيسي مع تعديل مقاسه ليناسب الموبايل واللاب توب بدون ما يقص */}
-      <div className="hero-title-wrap" style={{ width: '100%', padding: '0 10px', textAlign: 'center' }}>
-        <FadeIn delay={0.15} y={40} className="hero-title-motion">
-          <h1 
-            className="hero-heading" 
-            style={{ 
-              fontSize: 'clamp(32px, 13vw, 110px)', 
-              width: '100%', 
-              lineHeight: '1.1',
-              wordBreak: 'break-word'
-            }}
-          >
-            {settings.heroTitle}
-          </h1>
-        </FadeIn>
-      </div>
+      <div className="hero-title-wrap">
+        <FadeIn delay={0.15} y={40} className="hero-title-motion">
+          <h1 className="hero-heading">{settings.heroTitle}</h1>
+        </FadeIn>
+      </div>
 
-      <div className="hero-portrait">
-        <FadeIn delay={0.6} y={30}>
-          <Magnet>
-            <img src="photo.png" alt="HONDA portfolio portrait" />
-          </Magnet>
-        </FadeIn>
-      </div>
+      <div className="hero-portrait">
+        <FadeIn delay={0.6} y={30}>
+          <Magnet>
+            <img src="photo.png" alt="HONDA portfolio portrait" />
+          </Magnet>
+        </FadeIn>
+      </div>
 
-      <div className="hero-bottom-container">
-        <style>{`
-          .hero-bottom-container {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0 20px;
-            gap: 20px;
-          }
+      <div className="hero-bottom" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', width: '100%', padding: '0 20px' }}>
+        <FadeIn delay={0.35} y={20} style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+          <p
+            className="hero-blurb"
+            style={{
+              fontSize: 'clamp(14px, 3.8vw, 20px)', // حجم خط أصغر وأنسب للموبايل
+              textAlign: 'center',
+              whiteSpace: 'pre-line',
+              width: '100%',
+              maxWidth: '900px',
+              margin: '0 auto 24px auto',
+            }}
+          >
+            {settings.heroBlurb}
+          </p>
+        </FadeIn>
 
-          @media (min-width: 768px) {
-            .hero-bottom-container {
-              flex-direction: row !important;
-              justify-content: space-between !important;
-              align-items: flex-end !important;
-              padding: 0 40px !important;
-            }
-
-            .hero-blurb-wrapper {
-              flex: 1 !important;
-              max-width: 550px !important;
-            }
-
-            .hero-blurb {
-              text-align: left !important;
-              margin: 0 !important;
-            }
-
-            .hero-btn-wrapper {
-              width: auto !important;
-              display: flex !important;
-              justify-content: flex-end !important;
-            }
-          }
-        `}</style>
-
-        {/* وصف الهيرو */}
-        <FadeIn delay={0.35} y={20} className="hero-blurb-wrapper" style={{ width: '100%' }}>
-          <p
-            className="hero-blurb"
-            style={{
-              fontSize: 'clamp(13px, 3.5vw, 16px)',
-              textAlign: 'center',
-              whiteSpace: 'pre-line',
-              margin: '0 auto',
-              lineHeight: '1.4',
-            }}
-          >
-            {settings.heroBlurb}
-          </p>
-        </FadeIn>
-
-        {/* زرار التواصل */}
-        <FadeIn delay={0.5} y={20} className="hero-btn-wrapper" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-          <ContactButton />
-        </FadeIn>
-      </div>
-    </section>
-  );
+        <FadeIn delay={0.5} y={20} style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+          <ContactButton />
+        </FadeIn>
+      </div>
+    </section>
+  );
 }
-
 function Marquee() {
   const ref = useRef<HTMLElement>(null);
   const [offset, setOffset] = useState(0);

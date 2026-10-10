@@ -292,6 +292,7 @@ function Services() {
 }
 
 function DynamicProjectCard({project,index,categories}:{project:CMSProject;index:number;categories:{id:string;name:string}[]}){
+  const { settings } = useCMS();
  const ref=useRef<HTMLDivElement>(null);
  const [videoOpen,setVideoOpen]=useState(false);
  const {scrollYProgress}=useScroll({target:ref,offset:['start end','start start']});
@@ -313,7 +314,7 @@ function DynamicProjectCard({project,index,categories}:{project:CMSProject;index
  return <div ref={ref} className={`project-card-wrap ${isReel?'project-card-wrap-reel':''}`} style={{top:`${96+index*28}px`}}>
   <motion.article className={`project-card ${isReel?'project-card-reel':''}`} style={{scale}}>
    <div className="project-top"><div className="project-ident"><span className="project-number">{String(index+1).padStart(2,'0')}</span><div><span className="project-type">{categories.find(c=>c.id===project.categoryId)?.name||project.type} / {isReel?'Vertical Reel':'Landscape Video'}</span><h3>{project.name}</h3><p className="dynamic-project-desc">{project.description}</p></div></div>
-    {videoId?<button type="button" className="live-button video-open-button" onClick={openVideo}>Watch video <Play size={16} fill="currentColor"/></button>:<a className="live-button" href={`mailto:${readCMS().settings.email}?subject=${encodeURIComponent(`Project enquiry: ${project.name}`)}`}>Project enquiry <ArrowUpRight size={17}/></a>}
+    {videoId?<button type="button" className="live-button video-open-button" onClick={openVideo}>Watch video <Play size={16} fill="currentColor"/></button>:<a className="live-button" href={`mailto:${settings.email}?subject=${encodeURIComponent(`Project enquiry: ${project.name}`)}`}>Project enquiry <ArrowUpRight size={17}/></a>}
    </div>
    <div className={`project-gallery ${isReel?'is-reel':'is-landscape'}`}>
     <button type="button" disabled={!videoId} className={`project-video-visual ${isReel?'reel-media':''}`} onClick={openVideo} aria-label={videoId?`Play ${project.name} video`:`View ${project.name} project`}>

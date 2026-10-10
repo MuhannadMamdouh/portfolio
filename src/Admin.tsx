@@ -235,6 +235,26 @@ if (!isAuthenticated) {
     setData(d => ({ ...d, projects: d.projects.some(p => p.id === projectDraft.id) ? d.projects.map(p => p.id === projectDraft.id ? projectDraft : p) : [projectDraft, ...d.projects] }));
     setProjectDraft(null); setNotice('Project updated. Saving to Supabase…');
   };
+
+  // دالة تحريك المشروع لأعلى
+  const moveProjectUp = (index: number) => {
+    if (index === 0) return;
+    const newProjects = [...data.projects];
+    const temp = newProjects[index];
+    newProjects[index] = newProjects[index - 1];
+    newProjects[index - 1] = temp;
+    setData(d => ({ ...d, projects: newProjects }));
+  };
+
+  // دالة تحريك المشروع لأسفل
+  const moveProjectDown = (index: number) => {
+    if (index === data.projects.length - 1) return;
+    const newProjects = [...data.projects];
+    const temp = newProjects[index];
+    newProjects[index] = newProjects[index + 1];
+    newProjects[index + 1] = temp;
+    setData(d => ({ ...d, projects: newProjects }));
+  };
   
   const saveCategory = (e: FormEvent) => {
     e.preventDefault(); if (!categoryDraft?.name.trim()) return;
@@ -286,7 +306,60 @@ if (!isAuthenticated) {
       
       {tab === 'overview' && <><div className="welcome-panel"><div><span className="eyebrow">YOUR CREATIVE SPACE</span><h2>Make your work<br /><span>impossible to ignore.</span></h2><p>Manage HONDA portfolio content, categories, project formats and cursor design from one place.</p><button className="admin-primary" onClick={() => { setProjectDraft(emptyProject()); setTab('projects'); }}><Plus size={17} /> Add a project</button></div><div className="welcome-orb"><MonitorPlay size={74} strokeWidth={1} /><span>SHOW YOUR WORK</span></div></div><div className="admin-stats"><div className="stat-card"><span>Total projects</span><strong>{data.projects.length.toString().padStart(2, '0')}</strong><small>Across all categories</small></div><div className="stat-card"><span>Published</span><strong>{published.length.toString().padStart(2, '0')}</strong><small>Visible on portfolio</small></div><div className="stat-card"><span>Categories</span><strong>{data.categories.length.toString().padStart(2, '0')}</strong><small>Customizable categories</small></div></div><section className="admin-panel"><div className="panel-heading"><div><h3>Recent projects</h3><p>Your latest portfolio work</p></div><button className="admin-text-button" onClick={() => setTab('projects')}>Manage all <ArrowLeft size={15} /></button></div>{data.projects.slice(0, 4).map(p => <ProjectRow key={p.id} project={p} category={data.categories.find(c => c.id === p.categoryId)?.name || 'Uncategorized'} onEdit={() => { setProjectDraft(p); setTab('projects'); }} onToggle={() => setData(d => ({ ...d, projects: d.projects.map(x => x.id === p.id ? { ...x, published: !x.published } : x) }))} />)}</section></>}
       
-      {tab === 'projects' && <section className="admin-panel"><div className="panel-heading"><div><h3>Portfolio projects</h3><p>Choose a landscape video or vertical reel for every project.</p></div><button className="admin-primary" onClick={() => setProjectDraft(emptyProject())}><Plus size={17} /> New project</button></div>{data.projects.length === 0 ? <div className="admin-empty">No projects yet. Add your first project.</div> : data.projects.map(p => <ProjectRow key={p.id} project={p} category={data.categories.find(c => c.id === p.categoryId)?.name || 'Uncategorized'} onEdit={() => setProjectDraft(p)} onToggle={() => setData(d => ({ ...d, projects: d.projects.map(x => x.id === p.id ? { ...x, published: !x.published } : x) }))} onDelete={() => { if (confirm(`Delete “${p.name}”?`)) setData(d => ({ ...d, projects: d.projects.filter(x => x.id !== p.id) })); }} />)}</section>}
+
+      {tab === 'projects' && (
+  <section className="admin-panel">
+    <div className="panel-heading">
+      <div>
+        <h3>Portfolio projects</h3>
+        <p>Choose a landscape video or vertical reel for every project.</p>
+      </div>
+      <button className="admin-primary" onClick={() => setProjectDraft(emptyProject())}>
+        <Plus size={17} /> New project
+      </button>
+    </div>
+    {data.projects.length === 0 ? (
+      <div className="admin-empty">No projects yet. Add your first project.</div>
+    ) : (
+      data.projects.map((p, index) => (
+        <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+          {/* أزرار التحريك لأعلى ولأسفل */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <button 
+              type="button" 
+              onClick={() => moveProjectUp(index)} 
+              disabled={index === 0}
+              style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px', opacity: index === 0 ? 0.3 : 1 }}
+              title="تحريك لأعلى"
+            >
+              ▲
+            </button>
+            <button 
+              type="button" 
+              onClick={() => moveProjectDown(index)} 
+              disabled={index === data.projects.length - 1}
+              style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '12px', opacity: index === data.projects.length - 1 ? 0.3 : 1 }}
+              title="تحريك لأسفل"
+            >
+              ▼
+            </button>
+          </div>
+
+          {/* صف المشروع الأساسي */}
+          <div style={{ flex: 1 }}>
+            <ProjectRow 
+              project={p} 
+              category={data.categories.find(c => c.id === p.categoryId)?.name || 'Uncategorized'} 
+              onEdit={() => setProjectDraft(p)} 
+              onToggle={() => setData(d => ({ ...d, projects: d.projects.map(x => x.id === p.id ? { ...x, published: !x.published } : x) }))} 
+              onDelete={() => { if (confirm(`Delete “${p.name}”?`)) setData(d => ({ ...d, projects: d.projects.filter(x => x.id !== p.id) })); }} 
+            />
+          </div>
+        </div>
+      ))
+    )}
+  </section>
+)}
       
       {tab === 'categories' && <section className="admin-panel"><div className="panel-heading"><div><h3>Categories</h3><p>Create and rename categories used by project forms.</p></div><button className="admin-primary" onClick={() => setCategoryDraft({ id: crypto.randomUUID(), name: '', visible: true })}><Plus size={17} /> Add category</button></div>{data.categories.map(c => <div className="category-row" key={c.id}><div className="category-icon"><Tags size={18} /></div><div className="category-info"><strong>{c.name}</strong><span>{data.projects.filter(p => p.categoryId === c.id).length} projects</span></div><button className="icon-action" title={c.visible ? 'Hide category' : 'Show category'} onClick={() => setData(d => ({ ...d, categories: d.categories.map(x => x.id === c.id ? { ...x, visible: !x.visible } : x) }))}>{c.visible ? <Eye size={17} /> : <EyeOff size={17} />}</button><button className="icon-action" title="Edit" onClick={() => setCategoryDraft(c)}><Pencil size={17} /></button><button className="icon-action danger" title="Delete" onClick={() => { if (confirm(`Delete category “${c.name}”? Projects in it will become uncategorized.`)) setData(d => ({ ...d, categories: d.categories.filter(x => x.id !== c.id), projects: d.projects.map(p => p.categoryId === c.id ? { ...p, categoryId: '' } : p) })); }}><Trash2 size={17} /></button></div>)}</section>}
 
